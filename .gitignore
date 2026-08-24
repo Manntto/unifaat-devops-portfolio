@@ -1,0 +1,24 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente
+.env
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Build
+dist/
+build/
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# Chaves privadas
+*.pem
