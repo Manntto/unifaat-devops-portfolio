@@ -1,0 +1,84 @@
+# Docker Compose — TechNova API + PostgreSQL + Redis
+# Aula 02 TF — Matheus Mantovani (RA: 1120245)
+# Todas as variáveis sensíveis são carregadas do arquivo .env (não versionado)
+
+services:
+
+  # ─── API ──────────────────────────────────────────────────────────────────
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: technova-api
+    ports:
+      - "3001:3000"
+    environment:
+      - PORT=${PORT}
+      - NODE_ENV=${NODE_ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    # Aguarda postgres e redis estarem saudáveis antes de iniciar
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - technova-net
+    restart: unless-stopped
+
+  # ─── POSTGRESQL ───────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: technova-postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    # Volume nomeado garante persistência dos dados entre recreações do container
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - technova-net
+    restart: unless-stopped
+
+  # ─── REDIS ────────────────────────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: technova-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - technova-net
+    restart: unless-stopped
+
+# ─── REDES ──────────────────────────────────────────────────────────────────
+networks:
+  technova-net:
+    driver: bridge
+    name: technova-net
+
+# ─── VOLUMES ────────────────────────────────────────────────────────────────
+volumes:
+  # Volume nomeado para persistência do PostgreSQL
+  # docker compose down preserva os dados
+  # docker compose down -v APAGA os dados (use com cuidado!)
+  pgdata:
