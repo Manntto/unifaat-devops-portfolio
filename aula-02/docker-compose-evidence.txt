@@ -1,0 +1,38 @@
+=== docker compose ps ===
+NAME                IMAGE                COMMAND                  SERVICE    CREATED          STATUS                    PORTS
+technova-api        aula-02-api          "docker-entrypoint.s…"   api        17 seconds ago   Up 5 seconds              0.0.0.0:3001->3000/tcp, [::]:3001->3000/tcp
+technova-postgres   postgres:15-alpine   "docker-entrypoint.s…"   postgres   17 seconds ago   Up 16 seconds (healthy)   0.0.0.0:5433->5432/tcp, [::]:5433->5432/tcp
+technova-redis      redis:7-alpine       "docker-entrypoint.s…"   redis      17 seconds ago   Up 16 seconds (healthy)   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+
+=== GET http://localhost:3001/ ===
+{
+    "servico": "TechNova API - Aula 02 TF",
+    "aluno": "Matheus Mantovani",
+    "ra": "1120245",
+    "status": "online",
+    "banco": "postgres:5432/technova",
+    "cache": "redis:6379",
+    "timestamp": "2026-08-24T22:59:37.223Z"
+}
+
+=== GET http://localhost:3001/health ===
+{
+    "status": "healthy",
+    "uptime": 5.211341513,
+    "servicos": {
+        "api": "online",
+        "banco": "postgres:5432",
+        "cache": "redis:6379"
+    }
+}
+
+=== Redis PING ===
+PONG
+
+=== PostgreSQL SELECT version() ===
+ PostgreSQL 15.18 on x86_64-pc-linux-musl, compiled by gcc (Alpine 15.2.0) 15.2.0, 64-bit
+
+=== Network inspect (todos os serviços na mesma rede technova-net) ===
+technova-postgres — 172.20.0.2/16
+technova-redis    — 172.20.0.3/16
+technova-api      — 172.20.0.4/16
