@@ -1,0 +1,32 @@
+=== docker ps ===
+CONTAINER ID   IMAGE                  STATUS          PORTS                                         NAMES
+46fb4cc7ee1e   portfolio-aula01:1.0   Up 20 seconds   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp   portfolio-test
+
+=== GET / ===
+{
+    "servico": "DevOps Portfolio API",
+    "aluno": "Matheus Mantovani",
+    "ra": "1120245",
+    "aula": "01 - Fundamentos de Git e Docker",
+    "status": "online",
+    "timestamp": "2026-08-24T22:46:37.079Z"
+}
+
+=== GET /health ===
+{
+    "status": "healthy",
+    "uptime": 20.339943772,
+    "version": "1.0.0"
+}
+
+=== GET /about ===
+{
+    "aluno": "Matheus Mantovani",
+    "ra": "1120245",
+    "disciplina": "DevOps — UniFAAT 2026-2",
+    "professor": "Alexandre Tavares",
+    "descricao": "API de portfólio desenvolvida na Aula 01 para demonstrar fundamentos de Git e Docker"
+}
+
+=== docker logs ===
+Portfolio API rodando na porta 3000
