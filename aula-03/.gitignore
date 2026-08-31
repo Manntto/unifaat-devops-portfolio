@@ -1,0 +1,20 @@
+# Terraform state — NUNCA versionar (pode conter segredos e dados sensíveis)
+*.tfstate
+*.tfstate.backup
+
+# Diretório de plugins e cache do Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Arquivos de variáveis com valores reais (senhas, access keys)
+*.tfvars
+*.tfvars.json
+
+# Arquivos de override locais
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Planos salvos em binário
+*.tfplan
