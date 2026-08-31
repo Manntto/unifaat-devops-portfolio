@@ -1,0 +1,193 @@
+=== EVIDÊNCIA DE APPLY PARCIAL (AWS Academy — SCP bloqueia CreateUser/CreateGroup/CreateRole) ===
+
+Recursos CRIADOS COM SUCESSO na AWS (terraform apply):
+  - aws_iam_policy.s3_read           → arn:aws:iam::787257248194:policy/1120245-technova-s3-read
+  - aws_iam_policy.ec2_s3_full       → arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-full
+  - aws_iam_policy.deny_destructive  → arn:aws:iam::787257248194:policy/1120245-technova-deny-destructive
+  - aws_iam_policy.ec2_s3_app_data   → arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-app-data
+
+Recursos BLOQUEADOS pela SCP do AWS Academy (iam:CreateUser, iam:CreateGroup, iam:CreateRole):
+  - aws_iam_user.juliana, aws_iam_user.rafael, aws_iam_user.lucas
+  - aws_iam_group.developers, aws_iam_group.platform_eng
+  - aws_iam_role.ec2_role
+
+O código está correto e o terraform validate retorna "Success" — a restrição é da
+plataforma AWS Academy (Service Control Policy), não do código Terraform.
+
+=== TERRAFORM PLAN (estado atual — 4 policies no state, 13 recursos pendentes) ===
+
+[0m[1mdata.aws_iam_policy_document.ec2_trust_policy: Reading...[0m[0m
+[0m[1maws_iam_policy.ec2_s3_app_data: Refreshing state... [id=arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-app-data][0m
+[0m[1maws_iam_policy.deny_destructive: Refreshing state... [id=arn:aws:iam::787257248194:policy/1120245-technova-deny-destructive][0m
+[0m[1maws_iam_policy.ec2_s3_full: Refreshing state... [id=arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-full][0m
+[0m[1maws_iam_policy.s3_read: Refreshing state... [id=arn:aws:iam::787257248194:policy/1120245-technova-s3-read][0m
+[0m[1mdata.aws_iam_policy_document.ec2_trust_policy: Read complete after 0s [id=595599228][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+Terraform will perform the following actions:
+
+[1m  # aws_iam_group.developers[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group" "developers" {
+      [32m+[0m[0m arn       = (known after apply)
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "1120245-technova-developers"
+      [32m+[0m[0m path      = "/"
+      [32m+[0m[0m unique_id = (known after apply)
+    }
+
+[1m  # aws_iam_group.platform_eng[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group" "platform_eng" {
+      [32m+[0m[0m arn       = (known after apply)
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m name      = "1120245-technova-platform-eng"
+      [32m+[0m[0m path      = "/"
+      [32m+[0m[0m unique_id = (known after apply)
+    }
+
+[1m  # aws_iam_group_membership.developers[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group_membership" "developers" {
+      [32m+[0m[0m group = "1120245-technova-developers"
+      [32m+[0m[0m id    = (known after apply)
+      [32m+[0m[0m name  = "1120245-technova-developers-membership"
+      [32m+[0m[0m users = [
+          [32m+[0m[0m "1120245-juliana-dev",
+          [32m+[0m[0m "1120245-lucas-intern",
+          [32m+[0m[0m "1120245-rafael-platform",
+        ]
+    }
+
+[1m  # aws_iam_group_membership.platform_eng[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group_membership" "platform_eng" {
+      [32m+[0m[0m group = "1120245-technova-platform-eng"
+      [32m+[0m[0m id    = (known after apply)
+      [32m+[0m[0m name  = "1120245-technova-platform-eng-membership"
+      [32m+[0m[0m users = [
+          [32m+[0m[0m "1120245-rafael-platform",
+        ]
+    }
+
+[1m  # aws_iam_group_policy_attachment.developers_deny_destructive[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group_policy_attachment" "developers_deny_destructive" {
+      [32m+[0m[0m group      = "1120245-technova-developers"
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::787257248194:policy/1120245-technova-deny-destructive"
+    }
+
+[1m  # aws_iam_group_policy_attachment.developers_s3_read[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group_policy_attachment" "developers_s3_read" {
+      [32m+[0m[0m group      = "1120245-technova-developers"
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::787257248194:policy/1120245-technova-s3-read"
+    }
+
+[1m  # aws_iam_group_policy_attachment.platform_eng_ec2_s3_full[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_group_policy_attachment" "platform_eng_ec2_s3_full" {
+      [32m+[0m[0m group      = "1120245-technova-platform-eng"
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-full"
+    }
+
+[1m  # aws_iam_instance_profile.ec2_profile[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_instance_profile" "ec2_profile" {
+      [32m+[0m[0m arn         = (known after apply)
+      [32m+[0m[0m create_date = (known after apply)
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m name        = "1120245-technova-ec2-profile"
+      [32m+[0m[0m name_prefix = (known after apply)
+      [32m+[0m[0m path        = "/"
+      [32m+[0m[0m role        = "1120245-technova-ec2-role"
+      [32m+[0m[0m tags_all    = (known after apply)
+      [32m+[0m[0m unique_id   = (known after apply)
+    }
+
+[1m  # aws_iam_role.ec2_role[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role" "ec2_role" {
+      [32m+[0m[0m arn                   = (known after apply)
+      [32m+[0m[0m assume_role_policy    = jsonencode(
+            {
+              [32m+[0m[0m Statement = [
+                  [32m+[0m[0m {
+                      [32m+[0m[0m Action    = "sts:AssumeRole"
+                      [32m+[0m[0m Effect    = "Allow"
+                      [32m+[0m[0m Principal = {
+                          [32m+[0m[0m Service = "ec2.amazonaws.com"
+                        }
+                      [32m+[0m[0m Sid       = "AllowEC2AssumeRole"
+                    },
+                ]
+              [32m+[0m[0m Version   = "2012-10-17"
+            }
+        )
+      [32m+[0m[0m create_date           = (known after apply)
+      [32m+[0m[0m description           = "Role assumida por instâncias EC2 da TechNova para acesso ao S3"
+      [32m+[0m[0m force_detach_policies = false
+      [32m+[0m[0m id                    = (known after apply)
+      [32m+[0m[0m managed_policy_arns   = (known after apply)
+      [32m+[0m[0m max_session_duration  = 3600
+      [32m+[0m[0m name                  = "1120245-technova-ec2-role"
+      [32m+[0m[0m name_prefix           = (known after apply)
+      [32m+[0m[0m path                  = "/"
+      [32m+[0m[0m tags_all              = (known after apply)
+      [32m+[0m[0m unique_id             = (known after apply)
+
+      [32m+[0m[0m inline_policy (known after apply)
+    }
+
+[1m  # aws_iam_role_policy_attachment.ec2_role_s3_app_data[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_role_policy_attachment" "ec2_role_s3_app_data" {
+      [32m+[0m[0m id         = (known after apply)
+      [32m+[0m[0m policy_arn = "arn:aws:iam::787257248194:policy/1120245-technova-ec2-s3-app-data"
+      [32m+[0m[0m role       = "1120245-technova-ec2-role"
+    }
+
+[1m  # aws_iam_user.juliana[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_user" "juliana" {
+      [32m+[0m[0m arn           = (known after apply)
+      [32m+[0m[0m force_destroy = false
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m name          = "1120245-juliana-dev"
+      [32m+[0m[0m path          = "/"
+      [32m+[0m[0m tags_all      = (known after apply)
+      [32m+[0m[0m unique_id     = (known after apply)
+    }
+
+[1m  # aws_iam_user.lucas[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_user" "lucas" {
+      [32m+[0m[0m arn           = (known after apply)
+      [32m+[0m[0m force_destroy = false
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m name          = "1120245-lucas-intern"
+      [32m+[0m[0m path          = "/"
+      [32m+[0m[0m tags_all      = (known after apply)
+      [32m+[0m[0m unique_id     = (known after apply)
+    }
+
+[1m  # aws_iam_user.rafael[0m will be created
+[0m  [32m+[0m[0m resource "aws_iam_user" "rafael" {
+      [32m+[0m[0m arn           = (known after apply)
+      [32m+[0m[0m force_destroy = false
+      [32m+[0m[0m id            = (known after apply)
+      [32m+[0m[0m name          = "1120245-rafael-platform"
+      [32m+[0m[0m path          = "/"
+      [32m+[0m[0m tags_all      = (known after apply)
+      [32m+[0m[0m unique_id     = (known after apply)
+    }
+
+[1mPlan:[0m [0m13 to add, 0 to change, 0 to destroy.
+
+Changes to Outputs:
+  [32m+[0m[0m ec2_instance_profile_arn    = (known after apply)
+  [32m+[0m[0m ec2_role_arn                = (known after apply)
+  [32m+[0m[0m group_developers_arn        = (known after apply)
+  [32m+[0m[0m group_platform_eng_arn      = (known after apply)
+  [32m+[0m[0m user_juliana_arn            = (known after apply)
+  [32m+[0m[0m user_lucas_arn              = (known after apply)
+  [32m+[0m[0m user_rafael_arn             = (known after apply)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
