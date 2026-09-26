@@ -15,7 +15,7 @@ variable "project_name" {
 variable "owner_ra" {
   description = "RA do aluno - usado nas tags Owner"
   type        = string
-  default     = "20262"
+  default     = "1120245"
 }
 
 # ─── VPC ────────────────────────────────────────────────────────────────────

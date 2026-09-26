@@ -28,7 +28,7 @@ provider "aws" {
       Environment = "staging"
       ManagedBy   = "Terraform"
       Aula        = "06"
-      Owner       = "20262"
+      Owner       = "1120245"
     }
   }
 }
