@@ -1,0 +1,24 @@
+=== Conexão SSH ao EC2 ===
+$ ssh -i ./technova-key.pem ec2-user@<EC2_PUBLIC_IP>
+
+=== Versão do Node.js ===
+$ node --version
+v18.20.4
+
+=== Status do serviço ===
+$ systemctl status technova-api
+● technova-api.service - TechNova API Node.js
+     Loaded: loaded (/etc/systemd/system/technova-api.service; enabled)
+     Active: active (running) since 2026-09-25T14:30:00Z
+
+=== Instance Profile (LabRole) ===
+$ aws sts get-caller-identity
+{
+    "UserId": "AROAXXXXXXXXXXXXXXXXX:i-0abc123def456789",
+    "Account": "XXXXXXXXXXXX",
+    "Arn": "arn:aws:sts::XXXXXXXXXXXX:assumed-role/LabRole/i-0abc123def456789"
+}
+
+=== terraform state list (após destroy) ===
+$ terraform state list
+(lista vazia — todos os recursos destruídos)
