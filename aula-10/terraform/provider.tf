@@ -7,7 +7,7 @@ terraform {
     }
   }
   backend "s3" {
-    bucket       = "tfstate-reservas-180239260670"
+    bucket       = "tfstate-technova-864636683316"
     key          = "aula-10/terraform.tfstate"
     region       = "us-east-1"
     encrypt      = true
