@@ -1,4 +1,4 @@
-name: 🚀 CD Pipeline — TechNova Aula 10
+name: "🚀 CD Pipeline — TechNova Aula 10"
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint:
-    name: 🔍 Lint
+    name: "🔍 Lint"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -25,7 +25,7 @@ jobs:
       - run: npm run lint
 
   test:
-    name: 🧪 Test
+    name: "🧪 Test"
     runs-on: ubuntu-latest
     needs: lint
     defaults:
@@ -48,7 +48,7 @@ jobs:
           retention-days: 7
 
   build-push:
-    name: 🐳 Build + Push ECR
+    name: "🐳 Build + Push ECR"
     runs-on: ubuntu-latest
     needs: [lint, test]
     outputs:
@@ -78,12 +78,15 @@ jobs:
           docker push "$IMAGE"
           docker push "$REGISTRY/technova-api:latest"
           echo "image=$IMAGE" >> $GITHUB_OUTPUT
-          echo "✅ Push: $IMAGE"
+          echo "Pushed: $IMAGE"
 
   deploy:
-    name: 🚀 Deploy EC2
+    name: "🚀 Deploy EC2"
     runs-on: ubuntu-latest
     needs: build-push
+    env:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      DEPLOY_SHA: ${{ github.sha }}
     steps:
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
@@ -91,40 +94,40 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
+          envs: AWS_ACCOUNT_ID,DEPLOY_SHA
           script: |
-            REGISTRY=${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+            REGISTRY="${AWS_ACCOUNT_ID}.dkr.ecr.us-east-1.amazonaws.com"
             IMAGE="$REGISTRY/technova-api:latest"
-            SHA="${{ github.sha }}"
 
-            echo "🔑 Login no ECR..."
+            echo "Login no ECR via LabInstanceProfile..."
             aws ecr get-login-password --region us-east-1 \
               | docker login --username AWS --password-stdin "$REGISTRY"
 
-            echo "📥 Pull da imagem..."
+            echo "Pull da imagem..."
             docker pull "$IMAGE"
 
-            echo "🔄 Recreate: stop → rm → run..."
+            echo "Recreate: stop, rm, run..."
             docker stop technova-api || true
-            docker rm technova-api || true
+            docker rm   technova-api || true
             docker run -d \
               --name technova-api \
               -p 3000:3000 \
               --restart unless-stopped \
-              -e APP_VERSION="$SHA" \
+              -e APP_VERSION="$DEPLOY_SHA" \
               "$IMAGE"
 
-            echo "✅ Deploy concluído: $IMAGE"
+            echo "Deploy concluido: $IMAGE"
 
-      - name: Health Check pós-deploy
+      - name: Health Check
         run: |
-          echo "⏳ Aguardando aplicação iniciar..."
+          echo "Aguardando aplicacao iniciar..."
           for i in $(seq 1 30); do
             if curl -sf http://${{ secrets.EC2_HOST }}:3000/health | grep -q '"status":"ok"'; then
-              echo "✅ Health check passou na tentativa $i!"
+              echo "Health check passou na tentativa $i"
               exit 0
             fi
-            echo "Tentativa $i/30 — aguardando 5s..."
+            echo "Tentativa $i/30 aguardando 5s..."
             sleep 5
           done
-          echo "❌ Health check falhou após 30 tentativas"
+          echo "Health check falhou apos 30 tentativas"
           exit 1
