@@ -1,0 +1,96 @@
+name: 🏗️ Terraform Plan
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'aula-10/terraform/**'
+      - '.github/workflows/terraform-plan.yml'
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  terraform-plan:
+    name: 📋 Plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: aula-10/terraform
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar credenciais AWS (sessão do Learner Lab)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.9.0'
+
+      - name: Terraform Init
+        id: init
+        run: terraform init
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform fmt check
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -out=tfplan 2>&1 | tee plan_output.txt
+        continue-on-error: true
+
+      - name: Postar Plan como comentário no PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const planOutput = fs.readFileSync('aula-10/terraform/plan_output.txt', 'utf8');
+            const truncated = planOutput.length > 60000
+              ? planOutput.substring(0, 60000) + '\n... (truncado)'
+              : planOutput;
+
+            const status = '${{ steps.plan.outcome }}';
+            const icon = status === 'success' ? '✅' : '❌';
+
+            const comment = [
+              '## 🏗️ Terraform Plan — Aula 10',
+              '',
+              `**Resultado:** ${icon} ${status}`,
+              `**Validate:** ${{ steps.validate.outcome }}`,
+              `**fmt check:** ${{ steps.fmt.outcome }}`,
+              '',
+              '<details><summary>📋 Ver output completo do plan</summary>',
+              '',
+              '```hcl',
+              truncated,
+              '```',
+              '',
+              '</details>',
+              '',
+              '_Workflow: `terraform-plan.yml` | Commit: `${{ github.sha }}`_'
+            ].join('\n');
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: comment
+            });
+
+      - name: Falhar se o plan falhou
+        if: steps.plan.outcome == 'failure'
+        run: exit 1

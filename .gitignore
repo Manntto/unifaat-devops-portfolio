@@ -22,3 +22,9 @@ build/
 
 # Chaves privadas
 *.pem
+
+# Chave privada SSH aula-10
+aula-10/terraform/technova-aula10-key
+
+# Coverage reports
+coverage/
