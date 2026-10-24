@@ -95,5 +95,6 @@ resource "aws_instance" "api" {
     Projeto   = var.project
     ManagedBy = "terraform"
     Aula      = "10"
+    Pipeline  = "gitops"
   }
 }
