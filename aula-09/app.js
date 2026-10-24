@@ -39,9 +39,4 @@ if (require.main === module) {
 }
 
 
-// rota de debug — remover antes de produção
-app.get('/debug', (req, res) => {
-  const input = req.query.code;
-  eval(input);
-  res.json({ status: 'executed' });
 });
