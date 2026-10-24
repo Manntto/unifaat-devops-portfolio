@@ -38,6 +38,8 @@ module.exports = app;
 
 if (require.main === module) {
   app.listen(PORT, () => {
-    console.log(`TechNova API rodando na porta ${PORT}`);
+    console.log(`TechNova API rodando na porta ${PORT}`)
   });
 }
+
+// erro-intencional
