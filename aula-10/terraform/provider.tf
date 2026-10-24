@@ -7,11 +7,10 @@ terraform {
     }
   }
   backend "s3" {
-    bucket       = "tfstate-technova-864636683316"
-    key          = "aula-10/terraform.tfstate"
-    region       = "us-east-1"
-    encrypt      = true
-    use_lockfile = true
+    bucket  = "tfstate-technova-864636683316"
+    key     = "aula-10/terraform.tfstate"
+    region  = "us-east-1"
+    encrypt = true
   }
 }
 
